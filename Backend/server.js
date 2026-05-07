@@ -11,13 +11,13 @@ const appointmentRoutes = require("./routes/appointmentRoutes");
 
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || "").split(",").map((origin) => origin.trim()).filter(Boolean);
+const cors = require("cors");
 
 app.use(
   cors({
-    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+    origin: "https://healix-ashy.vercel.app",
     credentials: true,
-  }),
+  })
 );
 
 app.use(express.json());
