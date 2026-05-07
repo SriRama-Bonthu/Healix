@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import AppointmentCard from "../components/AppointmentCard";
 import API from "../api/axios";
 import Loader from "../components/Loader";
 import Footer from "../components/Footer";
+import PrescriptionCard from "../components/PrescriptionCard";
 import "../styles/pages/Dashboard.css";
 
-const Appointments = () => {
-  const [appointments, setAppointments] = useState([]);
+const MyPrescriptions = () => {
+  const [prescriptions, setPrescriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    const loadAppointments = async () => {
+    const loadPrescriptions = async () => {
       try {
         const token = localStorage.getItem("token");
-        const { data } = await API.get("/appointments/patient", {
+        const { data } = await API.get("/prescriptions/patient", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setAppointments(data);
+        setPrescriptions(data);
       } catch (error) {
         console.log(error);
       } finally {
@@ -29,7 +29,7 @@ const Appointments = () => {
       }
     };
 
-    loadAppointments();
+    loadPrescriptions();
   }, []);
 
   return (
@@ -52,27 +52,45 @@ const Appointments = () => {
                       color: "var(--primary-blue)",
                     }}
                   >
-                    My appointments
+                    Medical documents
                   </p>
-                  <h1>Appointment History</h1>
-                  <p>
-                    View and manage all your medical appointments
-                  </p>
+                  <h1>My Prescriptions</h1>
+                  <p>View and download your medical prescriptions</p>
                 </div>
               </div>
             </section>
 
             {loading ? (
               <Loader />
-            ) : appointments.length > 0 ? (
-              <section className="appointment-grid">
-                {appointments.map((appointment) => (
-                  <AppointmentCard key={appointment._id} appointment={appointment} />
+            ) : prescriptions.length > 0 ? (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns:
+                    "repeat(auto-fill, minmax(400px, 1fr))",
+                  gap: "24px",
+                  marginTop: "24px",
+                }}
+              >
+                {prescriptions.map((prescription) => (
+                  <PrescriptionCard
+                    key={prescription._id}
+                    prescription={prescription}
+                  />
                 ))}
-              </section>
+              </div>
             ) : (
-              <div className="empty-state">
-                <p>No appointments scheduled yet</p>
+              <div
+                className="empty-state"
+                style={{
+                  padding: "60px 20px",
+                  textAlign: "center",
+                  marginTop: "40px",
+                }}
+              >
+                <p style={{ fontSize: "18px", color: "var(--text-muted)" }}>
+                  No prescriptions yet
+                </p>
               </div>
             )}
           </main>
@@ -84,4 +102,4 @@ const Appointments = () => {
   );
 };
 
-export default Appointments;
+export default MyPrescriptions;

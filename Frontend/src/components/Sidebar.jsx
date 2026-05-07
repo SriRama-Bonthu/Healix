@@ -6,8 +6,10 @@ const Sidebar = ({ role = "patient", open, setOpen }) => {
 
   const patientLinks = [
     { to: "/patient", label: "Dashboard", icon: "📊" },
-    { to: "/doctors", label: "Find Doctors", icon: "👨‍⚕️" },
     { to: "/doctors", label: "Book Appointment", icon: "📅" },
+    { to: "/appointments", label: "My Appointments", icon: "📋" },
+    { to: "/my-prescriptions", label: "My Prescriptions", icon: "💊" },
+    { to: "/patient-profile", label: "My Profile", icon: "👤" },
   ];
 
   const doctorLinks = [

@@ -18,7 +18,13 @@ import VideoConsultation from "./pages/VideoConsultation";
 
 import DoctorProfile from "./pages/DoctorProfile";
 
+import PatientProfile from "./pages/PatientProfile";
+
 import CreatePrescription from "./pages/CreatePrescription";
+
+import Appointments from "./pages/Appointments";
+
+import MyPrescriptions from "./pages/MyPrescriptions";
 
 function App() {
   return (
@@ -32,6 +38,10 @@ function App() {
 
         <Route path="/patient" element={<PatientDashboard />} />
 
+        <Route path="/appointments" element={<Appointments />} />
+
+        <Route path="/my-prescriptions" element={<MyPrescriptions />} />
+
         <Route path="/doctor" element={<DoctorDashboard />} />
 
         <Route path="/doctors" element={<Doctors />} />
@@ -39,6 +49,8 @@ function App() {
         <Route path="/book/:doctorId" element={<BookAppointment />} />
 
         <Route path="/doctor-profile/:doctorId" element={<DoctorProfile />} />
+
+        <Route path="/patient-profile" element={<PatientProfile />} />
 
         <Route
           path="/prescription/:appointmentId"
