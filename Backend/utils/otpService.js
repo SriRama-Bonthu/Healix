@@ -12,10 +12,12 @@ const getEnvValue = (...keys) => {
 };
 
 const createOtpTransport = () => {
-  const host = getEnvValue("SMTP_HOST", "EMAIL_HOST");
-  const user = getEnvValue("SMTP_USER", "EMAIL_USER");
-  const pass = getEnvValue("SMTP_PASS", "EMAIL_PASS");
-  const port = getEnvValue("SMTP_PORT", "EMAIL_PORT");
+  const user = getEnvValue("SMTP_USER", "EMAIL_USER", "GMAIL_USER", "MAIL_USER");
+  const pass = getEnvValue("SMTP_PASS", "EMAIL_PASS", "GMAIL_PASS", "MAIL_PASS");
+  const host =
+    getEnvValue("SMTP_HOST", "EMAIL_HOST", "GMAIL_HOST", "MAIL_HOST") ||
+    (user && pass ? "smtp.gmail.com" : undefined);
+  const port = getEnvValue("SMTP_PORT", "EMAIL_PORT", "GMAIL_PORT", "MAIL_PORT") || "587";
 
   if (host && user && pass) {
     return nodemailer.createTransport({
@@ -37,11 +39,13 @@ const sendEmailOtp = async ({ to, otp }) => {
 
   if (!transport) {
     throw new Error(
-      "Email OTP is not configured. Set SMTP_HOST/SMTP_USER/SMTP_PASS or EMAIL_HOST/EMAIL_USER/EMAIL_PASS.",
+      "Email OTP is not configured. Set SMTP_HOST/SMTP_USER/SMTP_PASS, EMAIL_HOST/EMAIL_USER/EMAIL_PASS, or Gmail credentials.",
     );
   }
 
-  const fromAddress = getEnvValue("SMTP_FROM", "EMAIL_FROM") || getEnvValue("SMTP_USER", "EMAIL_USER");
+  const fromAddress =
+    getEnvValue("SMTP_FROM", "EMAIL_FROM", "GMAIL_FROM", "MAIL_FROM") ||
+    getEnvValue("SMTP_USER", "EMAIL_USER", "GMAIL_USER", "MAIL_USER");
 
   const info = await transport.sendMail({
     from: fromAddress,
