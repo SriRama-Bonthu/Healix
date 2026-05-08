@@ -13,8 +13,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const apiUrlConfigured = Boolean(import.meta.env.VITE_API_URL || import.meta.env.DEV);
-
   const submitHandler = async (e) => {
     e.preventDefault();
     setError("");
@@ -101,12 +99,6 @@ const Login = () => {
           </div>
 
           {error ? <p style={{ color: "var(--danger)", margin: 0 }}>{error}</p> : null}
-
-          {!apiUrlConfigured ? (
-            <p style={{ color: "var(--warning)", margin: 0, lineHeight: 1.5 }}>
-              Production API is not configured. Set <strong>VITE_API_URL</strong> to your deployed backend URL.
-            </p>
-          ) : null}
 
           <button className="btn btn-primary" type="submit" disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}

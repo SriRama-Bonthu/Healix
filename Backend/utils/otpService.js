@@ -1,29 +1,47 @@
 const nodemailer = require("nodemailer");
 const twilio = require("twilio");
 
+const getEnvValue = (...keys) => {
+  for (const key of keys) {
+    if (process.env[key]) {
+      return process.env[key];
+    }
+  }
+
+  return undefined;
+};
+
 const createOtpTransport = () => {
-  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+  const host = getEnvValue("SMTP_HOST", "EMAIL_HOST");
+  const user = getEnvValue("SMTP_USER", "EMAIL_USER");
+  const pass = getEnvValue("SMTP_PASS", "EMAIL_PASS");
+  const port = getEnvValue("SMTP_PORT", "EMAIL_PORT");
+
+  if (host && user && pass) {
     return nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: Number(process.env.SMTP_PORT) === 465,
+      host,
+      port: Number(port) || 587,
+      secure: Number(port) === 465,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user,
+        pass,
       },
     });
   }
 
-  return nodemailer.createTransport({
-    streamTransport: true,
-    newline: "unix",
-    buffer: true,
-  });
+  return null;
 };
 
 const sendEmailOtp = async ({ to, otp }) => {
   const transport = createOtpTransport();
-  const fromAddress = process.env.SMTP_FROM || process.env.SMTP_USER || "no-reply@healix.local";
+
+  if (!transport) {
+    throw new Error(
+      "Email OTP is not configured. Set SMTP_HOST/SMTP_USER/SMTP_PASS or EMAIL_HOST/EMAIL_USER/EMAIL_PASS.",
+    );
+  }
+
+  const fromAddress = getEnvValue("SMTP_FROM", "EMAIL_FROM") || getEnvValue("SMTP_USER", "EMAIL_USER");
 
   const info = await transport.sendMail({
     from: fromAddress,
@@ -50,16 +68,16 @@ const sendEmailOtp = async ({ to, otp }) => {
 };
 
 const sendPhoneOtp = async ({ to, otp }) => {
-  if (
-    process.env.TWILIO_ACCOUNT_SID &&
-    process.env.TWILIO_AUTH_TOKEN &&
-    process.env.TWILIO_FROM_NUMBER
-  ) {
-    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+  const accountSid = getEnvValue("TWILIO_ACCOUNT_SID");
+  const authToken = getEnvValue("TWILIO_AUTH_TOKEN");
+  const fromNumber = getEnvValue("TWILIO_FROM_NUMBER", "TWILIO_PHONE_NUMBER", "TWILIO_FROM");
+
+  if (accountSid && authToken && fromNumber) {
+    const client = twilio(accountSid, authToken);
 
     const message = await client.messages.create({
       body: `Your Healix verification code is ${otp}. It expires in 10 minutes.`,
-      from: process.env.TWILIO_FROM_NUMBER,
+      from: fromNumber,
       to,
     });
 
@@ -68,9 +86,9 @@ const sendPhoneOtp = async ({ to, otp }) => {
     return message;
   }
 
-  console.log(`Dev OTP for ${to}: ${otp}`);
-
-  return null;
+  throw new Error(
+    "SMS OTP is not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_FROM_NUMBER or TWILIO_PHONE_NUMBER.",
+  );
 };
 
 module.exports = {

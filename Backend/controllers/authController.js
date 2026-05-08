@@ -144,7 +144,15 @@ const register = async (req, res) => {
       otpExpiresAt,
     });
 
-    await sendOtp({ contactType, contactValue, otp });
+    try {
+      await sendOtp({ contactType, contactValue, otp });
+    } catch (sendError) {
+      await PendingRegistration.findByIdAndDelete(pendingRegistration._id);
+
+      return res.status(503).json({
+        message: sendError.message,
+      });
+    }
 
     res.status(200).json({
       message: `Verification code sent to your ${contactType}.`,
