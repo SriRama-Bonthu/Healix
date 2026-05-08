@@ -13,12 +13,13 @@ const app = express();
 
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: "https://healix-ashy.vercel.app",
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    "https://healix-ashy.vercel.app",
+    "https://healix-kbflq81fy-23a91a0578s-projects.vercel.app"
+  ],
+  credentials: true
+}));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
