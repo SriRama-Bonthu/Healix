@@ -7,7 +7,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -70,14 +70,14 @@ const Login = () => {
 
         <form onSubmit={submitHandler} className="auth-form">
           <div className="field">
-            <label htmlFor="login-email">Email Address</label>
+            <label htmlFor="login-identifier">Email Address or Phone Number</label>
             <input
-              id="login-email"
-              type="email"
+              id="login-identifier"
+              type="text"
               required
-              placeholder="you@example.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="you@example.com or +15551234567"
+              value={formData.identifier}
+              onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
             />
           </div>
 

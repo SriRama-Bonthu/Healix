@@ -4,7 +4,6 @@ const connectDB = require("./config/db");
 const cors = require("cors");
 const prescriptionRoutes = require("./routes/prescriptionRoutes");
 const authRoutes = require("./routes/authRoutes");
-const cors = require("cors");
 
 require("dotenv").config();
 connectDB();
@@ -20,7 +19,6 @@ app.use(
     credentials: true,
   })
 );
-
 
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
