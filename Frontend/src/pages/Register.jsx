@@ -8,7 +8,7 @@ const Register = () => {
 
   const [formData, setFormData] = useState({
     name: "",
-    contact: "",
+    email: "",
     password: "",
     role: "patient",
     specialization: "",
@@ -17,10 +17,6 @@ const Register = () => {
     profileImage: "",
   });
 
-  const [otp, setOtp] = useState("");
-  const [pendingRegistrationId, setPendingRegistrationId] = useState("");
-  const [verificationStep, setVerificationStep] = useState("details");
-  const [verificationMessage, setVerificationMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,28 +38,6 @@ const Register = () => {
   );
 
   const isDoctor = formData.role === "doctor";
-  const isOtpStep = verificationStep === "otp";
-
-  const submitRegistrationDetails = async () => {
-    const { data } = await API.post("/auth/register", {
-      ...formData,
-      consultationFee: isDoctor ? Number(formData.consultationFee) || 0 : 0,
-    });
-
-    setPendingRegistrationId(data.pendingRegistrationId);
-    setVerificationStep("otp");
-    setVerificationMessage(data.message || "Verification code sent.");
-  };
-
-  const submitOtp = async () => {
-    const { data } = await API.post("/auth/register/verify", {
-      pendingRegistrationId,
-      otp,
-    });
-
-    setVerificationMessage(data.message || "Account verified.");
-    navigate("/login");
-  };
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -71,26 +45,14 @@ const Register = () => {
     setLoading(true);
 
     try {
-      if (isOtpStep) {
-        await submitOtp();
-      } else {
-        await submitRegistrationDetails();
-      }
+      await API.post("/auth/register", {
+        ...formData,
+        consultationFee: isDoctor ? Number(formData.consultationFee) || 0 : 0,
+      });
+
+      navigate("/login");
     } catch (err) {
       setError(err?.response?.data?.message || "Unable to create your account right now.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    setError("");
-    setLoading(true);
-
-    try {
-      await submitRegistrationDetails();
-    } catch (err) {
-      setError(err?.response?.data?.message || "Unable to resend the verification code right now.");
     } finally {
       setLoading(false);
     }
@@ -126,9 +88,6 @@ const Register = () => {
       <section className="auth-card fade-in-up">
         <h2>Create Account</h2>
         <p className="auth-subtitle">Start your Healix experience in minutes.</p>
-        {verificationMessage ? (
-          <p style={{ margin: "10px 0 0", color: "var(--success)" }}>{verificationMessage}</p>
-        ) : null}
 
         <form onSubmit={submitHandler} className="auth-form">
           <div className="field">
@@ -144,14 +103,14 @@ const Register = () => {
           </div>
 
           <div className="field">
-            <label htmlFor="register-contact">Email Address or Phone Number</label>
+            <label htmlFor="register-email">Email Address</label>
             <input
-              id="register-contact"
-              type="text"
+              id="register-email"
+              type="email"
               required
-              placeholder="you@example.com or +15551234567"
-              value={formData.contact}
-              onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
 
@@ -233,33 +192,11 @@ const Register = () => {
             </div>
           ) : null}
 
-          {isOtpStep ? (
-            <div className="field">
-              <label htmlFor="register-otp">Verification Code</label>
-              <input
-                id="register-otp"
-                type="text"
-                inputMode="numeric"
-                maxLength="6"
-                required
-                placeholder="Enter 6-digit code"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-              />
-            </div>
-          ) : null}
-
           {error ? <p style={{ color: "var(--danger)", margin: 0 }}>{error}</p> : null}
 
           <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading ? (isOtpStep ? "Verifying code..." : "Sending verification code...") : isOtpStep ? "Verify and Create Account" : "Create Account"}
+            {loading ? "Creating account..." : "Create Account"}
           </button>
-
-          {isOtpStep ? (
-            <button className="btn btn-secondary" type="button" onClick={handleResendOtp} disabled={loading}>
-              Resend code
-            </button>
-          ) : null}
         </form>
 
         <p className="auth-footer">
