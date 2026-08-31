@@ -7,6 +7,10 @@ const createAppointment = async (req, res) => {
     console.log("BODY:", req.body);
     console.log("USER:", req.user);
 
+    if (req.user.role !== "patient") {
+      return res.status(403).json({ message: "Only patients can book appointments" });
+    }
+
     const { doctor, date, time } = req.body;
 
     const patient = await User.findById(req.user.id);
@@ -19,6 +23,10 @@ const createAppointment = async (req, res) => {
 
     if (!doctorUser) {
       return res.status(404).json({ message: "Doctor not found" });
+    }
+
+    if (doctorUser.role !== "doctor") {
+      return res.status(400).json({ message: "Appointments can only be booked with doctors" });
     }
 
     const appointment = await Appointment.create({
@@ -73,7 +81,19 @@ const getPatientAppointments = async (req, res) => {
 
 const approveAppointment = async (req, res) => {
   try {
+    if (req.user.role !== "doctor") {
+      return res.status(403).json({ message: "Only doctors can approve appointments" });
+    }
+
     const appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    if (appointment.doctor.toString() !== req.user.id) {
+      return res.status(403).json({ message: "You can only approve your own appointments" });
+    }
 
     appointment.status = "approved";
 
@@ -91,7 +111,23 @@ const approveAppointment = async (req, res) => {
 
 const startConsultation = async (req, res) => {
   try {
+    if (req.user.role !== "doctor") {
+      return res.status(403).json({ message: "Only doctors can start consultations" });
+    }
+
     const appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    if (appointment.doctor.toString() !== req.user.id) {
+      return res.status(403).json({ message: "You can only start your own appointments" });
+    }
+
+    if (!appointment.consultationRoom) {
+      appointment.consultationRoom = `heal-${appointment._id}`;
+    }
 
     appointment.status = "live";
 
@@ -107,7 +143,19 @@ const startConsultation = async (req, res) => {
 
 const endConsultation = async (req, res) => {
   try {
+    if (req.user.role !== "doctor") {
+      return res.status(403).json({ message: "Only doctors can end consultations" });
+    }
+
     const appointment = await Appointment.findById(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    if (appointment.doctor.toString() !== req.user.id) {
+      return res.status(403).json({ message: "You can only end your own appointments" });
+    }
 
     appointment.status = "completed";
 

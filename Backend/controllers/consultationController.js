@@ -1,16 +1,24 @@
 const Consultation = require("../models/Consultation");
+const Appointment = require("../models/Appointment");
 
 const createConsultation = async (req, res) => {
   try {
-    const { doctor, patient, appointmentId } = req.body;
+    const { appointmentId } = req.body;
+
+    const appointment = await Appointment.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found",
+      });
+    }
 
     const roomId = `heal-${appointmentId}`;
 
     const consultation = await Consultation.create({
-      doctor,
-      patient,
-      appointmentId,
+      appointment: appointmentId,
       roomId,
+      startedBy: req.user.id,
     });
 
     res.status(201).json(consultation);

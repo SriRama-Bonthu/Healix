@@ -4,6 +4,7 @@ const connectDB = require("./config/db");
 const cors = require("cors");
 const prescriptionRoutes = require("./routes/prescriptionRoutes");
 const authRoutes = require("./routes/authRoutes");
+const consultationRoutes = require("./routes/consultationRoutes");
 
 require("dotenv").config();
 connectDB();
@@ -24,6 +25,7 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/prescriptions", prescriptionRoutes);
+app.use("/api/consultations", consultationRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

@@ -44,6 +44,21 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+
+  age: {
+    type: Number,
+    default: null,
+  },
+
+  gender: {
+    type: String,
+    default: "",
+  },
+
+  phone: {
+    type: String,
+    default: "",
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

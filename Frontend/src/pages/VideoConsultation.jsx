@@ -35,6 +35,10 @@ const VideoConsultation = () => {
   };
 
   const markConsultationLive = async () => {
+    if (user?.role !== "doctor") {
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       await API.put(
@@ -48,6 +52,10 @@ const VideoConsultation = () => {
   };
 
   const markConsultationEnded = async () => {
+    if (user?.role !== "doctor") {
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       await API.put(

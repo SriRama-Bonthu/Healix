@@ -15,6 +15,9 @@ const register = async (req, res) => {
       experience = "",
       consultationFee = 0,
       profileImage = "",
+      age = null,
+      gender = "",
+      phone = "",
     } = req.body;
 
     const userExists = await User.findOne({ email });
@@ -43,9 +46,18 @@ const register = async (req, res) => {
       consultationFee,
 
       profileImage,
+
+      age,
+
+      gender,
+
+      phone,
     });
 
-    res.status(201).json(user);
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.status(201).json(userResponse);
   } catch (error) {
     res.status(500).json({
       message: error.message,
@@ -85,7 +97,19 @@ const login = async (req, res) => {
 
     res.json({
       token,
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        specialization: user.specialization,
+        experience: user.experience,
+        consultationFee: user.consultationFee,
+        profileImage: user.profileImage,
+        age: user.age,
+        gender: user.gender,
+        phone: user.phone,
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -97,7 +121,7 @@ const getDoctors = async (req, res) => {
   try {
     const doctors = await User.find({
       role: "doctor",
-    });
+    }).select("-password");
 
     res.json(doctors);
   } catch (error) {
@@ -106,8 +130,14 @@ const getDoctors = async (req, res) => {
     });
   }
 };
+
+const getProfile = async (req, res) => {
+  res.json(req.user);
+};
+
 module.exports = {
   register,
   login,
   getDoctors,
+  getProfile,
 };

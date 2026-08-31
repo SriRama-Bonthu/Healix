@@ -7,8 +7,10 @@ const {
   getConsultation,
 } = require("../controllers/consultationController");
 
-router.post("/", createConsultation);
+const { protect } = require("../middleware/authMiddleware");
 
-router.get("/:id", getConsultation);
+router.post("/", protect, createConsultation);
+
+router.get("/:id", protect, getConsultation);
 
 module.exports = router;
