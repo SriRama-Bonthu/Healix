@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://healix-f6ao.onrender.com/api/$1"
+      "destination": "https://healix-backend-7gpc.onrender.com/api/$1"
     },
     {
       "source": "/(.*)",
