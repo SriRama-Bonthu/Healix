@@ -55,7 +55,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
