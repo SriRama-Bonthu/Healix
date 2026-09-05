@@ -1,4 +1,4 @@
-# Healix
+# Healix - Digital HealthCare Platform
 
 Healix is a full-stack telemedicine web application that connects patients and doctors through appointment booking, video consultations, and digital prescriptions.
 
